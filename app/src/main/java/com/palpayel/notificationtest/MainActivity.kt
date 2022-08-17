@@ -8,9 +8,14 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.RemoteInput
+import com.palpayel.notificationtest.RoomDB.Student
+import com.palpayel.notificationtest.RoomDB.StudentDataBase
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,6 +27,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         notificationManager=getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+
+
+        val dbInstance =StudentDataBase.getStudentDataBase(this)
+
+        saveBtn.setOnClickListener {
+            GlobalScope.launch {
+                val student = Student(firstName = firstName.text.toString(), lastName = emailName.text.toString(), address = address.text.toString())
+                dbInstance?.getStudentDao()?.insertStudent(student)
+
+           val studentList = dbInstance?.getStudentDao()?.loadAll()
+                Log.e("Students","$studentList")
+            }
+        }
+
+
+
 
         createNotificationChannel(channelID,"DemoChannel","This is Demo")
 
